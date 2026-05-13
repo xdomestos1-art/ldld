@@ -1,0 +1,39 @@
+if game.PlaceId == 10179538382 or game.PlaceId == 15124180230 then
+    game:GetService("ScriptContext"):SetTimeout(1)
+    local UserInputService = game:GetService("UserInputService")
+    local GuiService = game:GetService("GuiService")
+    local Enum = Enum
+
+    local oldNamecall
+    local oldIndex
+    oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+        local method = getnamecallmethod()
+        if self == UserInputService or self == GuiService then
+            if method == "GetPlatform" then
+                return Enum.Platform.PS4
+            elseif method == "IsTenFootInterface" then
+                return true
+            elseif method == "GetPlatformName" then
+                return "PS4"
+            end
+        end
+
+        return oldNamecall(self, ...)
+    end)
+    oldIndex = hookmetamethod(game, "__index", function(tbl, idx)
+        if tostring(getcallingscript()) ~= "ControlModule" and tbl == UserInputService then
+            if idx == "TouchEnabled" then
+                return false
+            elseif idx == "MouseEnabled" then
+                return false
+            elseif idx == "KeyboardEnabled" then
+                return false
+            elseif idx == "GamepadEnabled" then
+                return true
+            elseif idx == "ControllerEnabled" then
+                return true
+            end
+        end
+        return oldIndex(tbl, idx)
+    end)
+end
